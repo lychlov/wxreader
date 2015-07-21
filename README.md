@@ -8,6 +8,7 @@
 2、安装python requests扩展库：在windows的命令行窗口下，进入c:\python27\scripts，运行pip install requests命令进行安装；在linux或osx下，直接用pip install requests安装
 
 二、运行方法及说明
+
 （方式一）、使用绑定的api接口：
  
   1、在命令行窗口下进入脚本所在的在目录，运行python wxreader.py
@@ -27,5 +28,7 @@
   1、在命令行窗口下，运行python wxreader_yzm.py，会自动读取验证码并存为图片yzm.jpg，手动输入验证码后，即可读取指定的阅读量和点赞量。
 
   2、使用该方式，需要安装一个图形PIL库，安装方法为：pip install pillow
+  
+  3、该方式的优点是接口永不过期，麻烦的地方是每读20条就要输入一次验证码，偶尔会出现key失效。
 
 调用的接口可在http://51tools.info/wx/weixin.aspx相关页面上获取。
