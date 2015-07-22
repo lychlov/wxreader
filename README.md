@@ -3,7 +3,7 @@
 
 一、需安装的软件
 
-1、安装python 2.7.10（或其它版本，2.7.10自带了pip
+1、安装python 2.7.10（或其它版本，2.7.10自带了pip）
 
 2、安装python requests扩展库：在windows的命令行窗口下，进入c:\python27\scripts，运行pip install requests命令进行安装；在linux或osx下，直接用pip install requests安装
 
