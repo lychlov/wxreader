@@ -3,7 +3,6 @@
 import subprocess
 import re
 import os
-import datetime
 from StringIO import StringIO
 try:
     import requests
@@ -21,6 +20,7 @@ class wx_reader:
 
     def __init__(self):
         self.__url_file = 'url.txt'
+        self.__result_file = "result.txt"
         self.__url_index = 'http://51tools.info/wx/weixin.aspx'
         self.__url_verifycode = 'http://51tools.info/captcha.aspx'
         self.__url_post = 'http://51tools.info/wx/getnum.ashx'
@@ -70,7 +70,7 @@ class wx_reader:
         '''
         image_file = self.__get_http_image(self.__url_verifycode, req)
         if image_file == None:
-            print u'获得验证码图片失败！'
+            print u'[-]获得验证码图片失败！'
             return None
         subprocess.Popen(image_file, shell=True)
         code = raw_input('input the yzm:')
@@ -142,12 +142,11 @@ class wx_reader:
         '''
         save the result to file 
         '''
-        filename = datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
-        filename += '.txt'
-        with open(filename, 'w') as f:
+        with open(self.__result_file, 'w') as f:
             for r in result:
                 f.write('%d,%d,%s%s' % (r[0], r[1], r[2], os.linesep))
-        return filename
+
+        return True
 
     def __do_request(self, wx_url_list):
         '''
@@ -160,7 +159,7 @@ class wx_reader:
         s = requests.session()
         r = s.get(self.__url_index, headers=headers)
         if r.status_code == requests.codes.ok:
-            print u'读取接口页面成功！'
+            print u'[+]读取接口页面成功！'
             yzm = self.__get_yzm_image_and_input(s)
             if yzm == None:
                 return None
@@ -168,17 +167,17 @@ class wx_reader:
 
             r = s.post(self.__url_post, data=post_data, headers=headers)
             if r.status_code == requests.codes.ok:
-                print u'读取查询页面成功！'
+                print u'[+]读取查询页面成功！'
                 (success, msg) = self.__check_response(r.content)
                 if success:
-                    print u'获得数据并分析。。。'
+                    print u'[+]获得数据并分析。。。'
                     response_result = self.__get_response(r.content)
                 else:
-                    print u'获取数据失败：', msg
+                    print u'[-]获取数据失败：', msg
             else:
-                print u'读取查询页面失败！'
+                print u'[-]读取查询页面失败！'
         else:
-            print u'读取接口页面失败！'
+            print u'[-]读取接口页面失败！'
 
         return response_result
 
@@ -192,22 +191,30 @@ class wx_reader:
         request_round = len(url_list) / self.__max_line_per_request
         if len(url_list) % self.__max_line_per_request > 0:
             request_round += 1
-        for i in range(request_round):
-            urls = url_list[
-                i*self.__max_line_per_request:(i+1)*self.__max_line_per_request]
-            r = self.__do_request(urls)
-            results.extend(r)
+        print u'[+]读取文章列表成功，共%d条记录！'%len(url_list)
 
-        # print results
-        if len(results) > 0:
-            file_name = self.__write_result(results)
-            print u'保存查询结果到文件%s成功！' % file_name
-
+        try:
+            for i in range(request_round):
+                urls = url_list[
+                    i*self.__max_line_per_request:(i+1)*self.__max_line_per_request]
+                while True:
+                    print u'[+]正在处理第%d条记录' %(i*self.__max_line_per_request + 1)
+                    r = self.__do_request(urls)
+                    if len(r) > 0 :
+                        results.extend(r)
+                        break
+            # print results
+            if len(results) > 0:
+                if self.__write_result(results):
+                    print u'[+]保存%d条查询结果到文件%s成功！' % (len(results),self.__result_file)
+                else:
+                    print u'[-]保存%d条查询结果到文件%s失败！' % (len(results),self.__result_file)
+        except KeyboardInterrupt:
+            print '[-]用户中断，程序退出'
 
 def main():
     app = wx_reader()
     app.run()
-
 
 if __name__ == '__main__':
     main()

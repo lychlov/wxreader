@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 import os
-import datetime
 import json
 import time
 try:
@@ -113,35 +112,36 @@ class wx_reader:
         if len(url_list) % self.__max_line_per_request > 0:
             request_round += 1
 
-        for i in range(request_round):
-            #do request by one time
-            urls = url_list[
-                i*self.__max_line_per_request:(i+1)*self.__max_line_per_request]
-            print u'[+]正在处理第%d条记录' %(i*self.__max_line_per_request + 1)
-            r = self.__do_request(urls)
-            #if the result > 0,then this request is success;so save the result and delay
-            if len(r) >0:
-                results.extend(r)
-            else:
-            #if the result <=0,this request is fail,so save the rest url list to url buffer text for next run
-            #and stop reading next url list
-                self.__writeto_url_buffer_textfile(url_list[i*self.__max_line_per_request:])
-                break
-            if i+1 < request_round:
-                print u'[+]暂停%d秒。。。' % self.__delay_second_per_request
-                time.sleep(self.__delay_second_per_request)
- 
-        #if all the url have success read,then empty the url buffer file
-        if len(results) == len(url_list):
-            self.__writeto_url_buffer_textfile([])
+        try:
+            for i in range(request_round):
+                #do request by one time
+                urls = url_list[
+                    i*self.__max_line_per_request:(i+1)*self.__max_line_per_request]
+                print u'[+]正在处理第%d条记录' %(i*self.__max_line_per_request + 1)
+                r = self.__do_request(urls)
+                #if the result > 0,then this request is success;so save the result and delay
+                if len(r) >0:
+                    results.extend(r)
+                else:
+                #if the result <=0,this request is fail,so save the rest url list to url buffer text for next run
+                #and stop reading next url list
+                    self.__writeto_url_buffer_textfile(url_list[i*self.__max_line_per_request:])
+                    break
+                if i+1 < request_round:
+                    print u'[+]暂停%d秒。。。' % self.__delay_second_per_request
+                    time.sleep(self.__delay_second_per_request)
+                   #if all the url have success read,then empty the url buffer file
+            if len(results) == len(url_list):
+                self.__writeto_url_buffer_textfile([])
+            # print results
+            if len(results) > 0:
+                if self.__write_result(results,result_file_writemode):
+                    print u'[+]保存%d条查询结果到文件%s成功！' % (len(results),self.__result_file)
+                else:
+                    print u'[-]保存%d条查询结果到文件%s失败！' % (len(results),self.__result_file)
 
-        # print results
-        if len(results) > 0:
-            if self.__write_result(results,result_file_writemode):
-                print u'[+]保存%d条查询结果到文件%s成功！' % (len(results),self.__result_file)
-            else:
-                print u'[-]保存%d条查询结果到文件%s失败！' % (len(results),self.__result_file)
-
+        except KeyboardInterrupt:
+            print '[-]用户中断，程序退出' 
 
 def main():
     #define url list file and api
