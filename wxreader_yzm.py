@@ -25,7 +25,7 @@ class wx_reader:
         self.__url_verifycode = 'http://51tools.info/captcha.aspx'
         self.__url_post = 'http://51tools.info/wx/getnum.ashx'
         # 每次查询请求时最多的条数
-        self.__max_line_per_request = 20
+        self.__max_line_per_request = 1
 
     def __get_url_from_file(self):
         '''
@@ -172,6 +172,8 @@ class wx_reader:
                 if success:
                     print u'[+]获得数据并分析。。。'
                     response_result = self.__get_response(r.content)
+                    if len(response_result) <=0:
+                        print r.content
                 else:
                     print u'[-]获取数据失败：', msg
             else:

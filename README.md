@@ -3,7 +3,7 @@
 
 #一、需安装的软件
 
-1. 安装python 2.7.10（或其它版本，2.7.10自带了pip）
+1. 安装python 2.7
 
 2. 安装python requests扩展库：
 	* 在windows的命令行窗口下，进入c:\python27\scripts，运行pip install requests命令进行安装；
@@ -32,5 +32,5 @@
 
   2. 使用该方式，需要安装一个图形PIL库，安装方法为：pip install pillow
   
-  3. 该方式的优点是接口永不过期，麻烦的地方是每读20条就要输入一次验证码，偶尔会出现key失效。
-  4. 调用的接口可在http://51tools.info/wx/weixin.aspx相关页面上获取。
+  3. 该方式的优点是接口永不过期，麻烦的地方是每读1条就要输入一次验证码，偶尔会出现key失效。(目前好象是只能一条一条地查询了）
+  4. 调用的接口可在[http://51tools.info/wx/weixin.aspx](http://51tools.info/wx/weixin.aspx)相关页面上获取。
